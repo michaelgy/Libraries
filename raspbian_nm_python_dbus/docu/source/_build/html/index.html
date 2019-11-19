@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Libreria para conexión wifi en Python usando NetworkManager para Raspbian. &#8212; wifi_raspbian_eap 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="libreria-para-conexion-wifi-en-python-usando-networkmanager-para-raspbian">
+<h1>Libreria para conexión wifi en Python usando NetworkManager para Raspbian.<a class="headerlink" href="#libreria-para-conexion-wifi-en-python-usando-networkmanager-para-raspbian" title="Permalink to this headline">¶</a></h1>
+<p>Esta libreria es desarrollada utilizando <em>Python3</em> y la interfaz para <em>dbus</em> de <em>NetworkManager</em>,
+lo cual permite usar el servicio <em>NetworkManager</em>, que es un administrador de redes muy popular
+y robusto en sistemas Linux, a través de <em>Python</em>.</p>
+<p>En <em>Raspbian</em> por defecto se encuentra el servicio y la interfaz grafica del administrador de
+conexiones <em>dhcpcd</em>, este es muy intuitivo y provee unas funcionalidades muy básicas, pero esto
+a su vez impide que sea posible establecer conexiones que requieran una configuración específica,
+como lo son las conexiones <strong>WPA2-EAP</strong>. Por esta razón y por la necesidad de configurar el
+administrador de conexiones desde <em>python</em>, se ha desarrollado esta libreria, que pone en
+disposición funciones de fácil uso y configuración, especialmente para conexiones:</p>
+<ul class="simple">
+<li><p>Sin seguridad (abiertas).</p></li>
+<li><p>Con protocolo de seguridad <strong>TKIP-CCMP</strong> (contraseña).</p></li>
+<li><p>Con protocolo de seguridad <strong>EAP</strong> (usuario y contraseña).</p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="instalacion">
+<h1>Instalación<a class="headerlink" href="#instalacion" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="deshabilitar-dhcpcd-servicio-e-icono-en-el-panel-o-barra-de-herramientas">
+<h2>Deshabilitar dhcpcd (servicio e icono en el panel o barra de herramientas)<a class="headerlink" href="#deshabilitar-dhcpcd-servicio-e-icono-en-el-panel-o-barra-de-herramientas" title="Permalink to this headline">¶</a></h2>
+<p>Es necesario deshabilitar el servicio <em>dhcpcd</em> que se inicia en el proceso de arranque, para
+evitar tener conflictos con el servicio de <em>NetworkManager</em>, esto logra ejecutando en consola
+el siguiente comando:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">sytemctl</span> <span class="n">disable</span> <span class="n">dhcpcd</span>
+</pre></div>
+</div>
+<p>Además en el panel aparece un icono relacionado con la interfaz grafica de <em>dhcpcd</em>, este icono se puede
+deshabilitar comentando del archivo <strong>TODO</strong> y las siguientes lineas:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">**</span><span class="n">TODO</span><span class="o">**</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="instalar-networkmanager-y-las-libreras-necesarias-para-python">
+<h2>Instalar NetworkManager y las libreras necesarias para python<a class="headerlink" href="#instalar-networkmanager-y-las-libreras-necesarias-para-python" title="Permalink to this headline">¶</a></h2>
+<p>Para instalar <em>NetworkManger</em> se debe ejecutar el siguiente comando en consola:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">network</span><span class="o">-</span><span class="n">manager</span>
+</pre></div>
+</div>
+<p>opcionalmente se puede instalar un inspeccionador de la interaz <em>dbus</em>
+con el siguiente comando:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">d</span><span class="o">-</span><span class="n">feet</span>
+</pre></div>
+</div>
+<p>Se deben instalar las dependencias de python necesarias para controlar la interfaz <em>dbus</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">python3</span><span class="o">-</span><span class="n">gi</span> <span class="n">python3</span><span class="o">-</span><span class="n">gi</span><span class="o">-</span><span class="n">cairo</span> <span class="n">gir1</span><span class="o">.</span><span class="mi">2</span><span class="o">-</span><span class="n">gtk</span><span class="o">-</span><span class="mf">3.0</span>
+</pre></div>
+</div>
+<p>Y por ultimo se instala la interfaz de comunicación de <em>NetworkManager</em> para <em>dbus</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pip3</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">networkmanager</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="uso">
+<h1>Uso<a class="headerlink" href="#uso" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="impotar-la-libreria">
+<h2>Impotar la libreria<a class="headerlink" href="#impotar-la-libreria" title="Permalink to this headline">¶</a></h2>
+<p>Para utilizar esta libreria primero debe importarla:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nm_dbus_python</span>
+</pre></div>
+</div>
+<p>Debe asegurarse de que la carpeta nm_dbus_python se encuentra en el directorio de trabajo o en el Path.</p>
+</div>
+<div class="section" id="conexion-a-redes-wifi">
+<h2>Conexion a redes Wifi:<a class="headerlink" href="#conexion-a-redes-wifi" title="Permalink to this headline">¶</a></h2>
+<p>Para conectarse a una red Wifi sin seguridad, puede utilizar el siguiente comando:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nm_dbus_python</span><span class="o">.</span><span class="n">connecttoAP</span><span class="p">(</span><span class="n">ssid</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Para conectarse a una red Wifi con seguridad PSK, puede utilizar el siguiente comando:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nm_dbus_python</span><span class="o">.</span><span class="n">connecttoAP</span><span class="p">(</span><span class="n">ssid</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">pssw</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Para conectarse a una red Wifi con seguridad EAP, puede utilizar el siguiente comando:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nm_dbus_python</span><span class="o">.</span><span class="n">connecttoAP</span><span class="p">(</span><span class="n">ssid</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">pssw</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">usr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>en los ejemplos anteriores, los parametros ssid, pssw y usr, son cadenas de caracteres,
+por ejemplo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nm_dbus_python</span><span class="o">.</span><span class="n">connecttoAP</span><span class="p">(</span><span class="s2">&quot;wifi network&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ademas, la funcion connectoAP cuenta con un parametro adicional para establecer
+un tiempo maximo de espera para la respuesta de la conexion, por ejemplo, si se
+va a esperar como maximo 5 segundos a que se conecte a una red, se debe utilizar
+de la siguiente forma:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nm_dbus_python</span><span class="o">.</span><span class="n">connecttoAP</span><span class="p">(</span><span class="s2">&quot;wifi network&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>si se conoce el bssid (direccion MAC) de la red se puede utilizar el siguiente
+comando:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nm_dbus_python</span><span class="o">.</span><span class="n">connecttoAP</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">bssid</span><span class="o">=</span><span class="s2">&quot;CC:35:40:98:A8:3F&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>tambien se puede ingresar el bssid y el ssid de la red:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nm_dbus_python</span><span class="o">.</span><span class="n">connecttoAP</span><span class="p">(</span><span class="s2">&quot;wifi network&quot;</span><span class="p">,</span><span class="n">bssid</span><span class="o">=</span><span class="s2">&quot;CC:35:40:98:A8:3F&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>en este caso se tratara de conectar a la red “wifi network”, en caso de encontrar
+la red o de no poder acceder a ella, intentara conectarse a la red con bssid = <code class="docutils literal notranslate"><span class="pre">&quot;CC:35:40:98:A8:3F&quot;</span></code></p>
+</div>
+</div>
+<div class="section" id="module-nm_dbus_python">
+<span id="api"></span><h1>API<a class="headerlink" href="#module-nm_dbus_python" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="nm_dbus_python.Invitados_JaverianaCali">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">Invitados_JaverianaCali</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.Invitados_JaverianaCali" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to connect to the network ‘Invitados JaverianaCali’.</p>
+<p>Is assumed that Invitados JaverianaCali is open. This function is only for test, 
+use connecttoAP instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> (<em>str</em>) – is a string with a valid user</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – is a string with the password of the user</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.JaverianaCali">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">JaverianaCali</code><span class="sig-paren">(</span><em class="sig-param">user</em>, <em class="sig-param">password</em><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.JaverianaCali" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to connect to the network JaverianaCali with the given user and password.</p>
+<p>Is assumed that JaverianaCali is an 802.1x connection. This function is only for test, 
+use connecttoAP instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> (<em>str</em>) – is a string with a valid user</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – is a string with the password of the user</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.accessPoints">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">accessPoints</code><span class="sig-paren">(</span><em class="sig-param">prop</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.accessPoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to get available access points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prop</strong> (<em>str</em>) – is the property that must have an access point of interest</p></li>
+<li><p><strong>value</strong> (<em>str</em>) – is the respective value that property must have</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple with availables access points and the wireless device</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.connectMAC">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">connectMAC</code><span class="sig-paren">(</span><em class="sig-param">bssid</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.connectMAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>This functions try to connect to a network with the given bssid(MacAddress)</p>
+<p>Currently this function can only connecto to:</p>
+<ul class="simple">
+<li><p>open networks</p></li>
+<li><p>psk tkip networks</p></li>
+<li><p>peap mschapv2 networks</p></li>
+</ul>
+<p>this function prioritizes ssid over bssid
+always return the bssid of the network connected to</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bssid</strong> (<em>str</em>) – is the bssid(MacAddress) of the access point to connect to</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>False if the connection failed or a string with the MacAddress</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool|str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.connectProfile">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">connectProfile</code><span class="sig-paren">(</span><em class="sig-param">setting</em>, <em class="sig-param">key</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.connectProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to get previously saved connection profiles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>setting</strong> (<em>str</em>) – is the setting that must have a connection profile</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – is the respective key that a property of setting must have</p></li>
+<li><p><strong>value</strong> (<em>str</em>) – is the respective value of key must have</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A settings object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.connecttoAP">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">connecttoAP</code><span class="sig-paren">(</span><em class="sig-param">ssid</em>, <em class="sig-param">bssid=''</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em>, <em class="sig-param">timeout=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.connecttoAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>This functions try to connect to a network with the given parameters</p>
+<p>Currently this function can only connecto to:</p>
+<ul class="simple">
+<li><p>open networks</p></li>
+<li><p>psk tkip networks</p></li>
+<li><p>peap mschapv2 networks</p></li>
+</ul>
+<p>this function prioritizes ssid over bssid
+always return the bssid of the network connected to</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssid</strong> (<em>str</em>) – is the ssid of the access point to connect to</p></li>
+<li><p><strong>timeout</strong> (<em>int</em>) – is the numbers of seconds to wait for connection, -1 for wait until connect</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>False if the connection failed or a string with the MacAddress</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool|str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.create_connProfile">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">create_connProfile</code><span class="sig-paren">(</span><em class="sig-param">ssid</em>, <em class="sig-param">bssid=''</em>, <em class="sig-param">user=''</em>, <em class="sig-param">password=''</em><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.create_connProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to create a new connection profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ssid</strong> (<em>str</em>) – is the ssid of the access point.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary with all the information necessary to create a connection profile</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.deactive_wireless_conn">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">deactive_wireless_conn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.deactive_wireless_conn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to disconnect all active wireless connections.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nm_dbus_python.get_all_ap_info">
+<code class="sig-prename descclassname">nm_dbus_python.</code><code class="sig-name descname">get_all_ap_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nm_dbus_python.get_all_ap_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function used to get the attributes of interest of the available networks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a list of dictionaries with the attributes in attr_interest list</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">wifi_raspbian_eap</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Michael Guerrero.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

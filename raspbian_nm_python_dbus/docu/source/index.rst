@@ -1,0 +1,126 @@
+.. wifi_raspbian_eap documentation master file, created by
+   sphinx-quickstart on Sat Sep 14 16:06:41 2019.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+==========================================================================
+Libreria para conexión wifi en Python usando NetworkManager para Raspbian.
+==========================================================================
+
+Esta libreria es desarrollada utilizando *Python3* y la interfaz para *dbus* de *NetworkManager*,
+lo cual permite usar el servicio *NetworkManager*, que es un administrador de redes muy popular
+y robusto en sistemas Linux, a través de *Python*.
+
+En *Raspbian* por defecto se encuentra el servicio y la interfaz grafica del administrador de 
+conexiones *dhcpcd*, este es muy intuitivo y provee unas funcionalidades muy básicas, pero esto
+a su vez impide que sea posible establecer conexiones que requieran una configuración específica,
+como lo son las conexiones **WPA2-EAP**. Por esta razón y por la necesidad de configurar el
+administrador de conexiones desde *python*, se ha desarrollado esta libreria, que pone en
+disposición funciones de fácil uso y configuración, especialmente para conexiones:
+
+* Sin seguridad (abiertas).
+* Con protocolo de seguridad **TKIP-CCMP** (contraseña).
+* Con protocolo de seguridad **EAP** (usuario y contraseña).
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Contenido:
+
+============
+Instalación
+============
+
+Deshabilitar dhcpcd (servicio e icono en el panel o barra de herramientas)
+---------------------------------------------------------------------------
+
+Es necesario deshabilitar el servicio *dhcpcd* que se inicia en el proceso de arranque, para
+evitar tener conflictos con el servicio de *NetworkManager*, esto logra ejecutando en consola 
+el siguiente comando::
+
+    sudo sytemctl disable dhcpcd
+
+Además en el panel aparece un icono relacionado con la interfaz grafica de *dhcpcd*, este icono se puede
+deshabilitar comentando del archivo **TODO** y las siguientes lineas::
+
+    **TODO**
+
+Instalar NetworkManager y las libreras necesarias para python
+--------------------------------------------------------------
+
+Para instalar *NetworkManger* se debe ejecutar el siguiente comando en consola::
+
+    sudo apt-get install network-manager
+
+opcionalmente se puede instalar un inspeccionador de la interaz *dbus*
+con el siguiente comando::
+
+    sudo apt-get install d-feet
+
+Se deben instalar las dependencias de python necesarias para controlar la interfaz *dbus*::
+
+    sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0
+
+Y por ultimo se instala la interfaz de comunicación de *NetworkManager* para *dbus*::
+
+    sudo pip3 install python-networkmanager
+
+
+===
+Uso
+===
+
+Impotar la libreria
+-------------------
+
+Para utilizar esta libreria primero debe importarla::
+
+    import nm_dbus_python
+
+Debe asegurarse de que la carpeta nm_dbus_python se encuentra en el directorio de trabajo o en el Path.
+
+Conexion a redes Wifi:
+----------------------
+
+Para conectarse a una red Wifi sin seguridad, puede utilizar el siguiente comando::
+
+    nm_dbus_python.connecttoAP(ssid)
+
+Para conectarse a una red Wifi con seguridad PSK, puede utilizar el siguiente comando::
+
+    nm_dbus_python.connecttoAP(ssid, password=pssw)
+
+Para conectarse a una red Wifi con seguridad EAP, puede utilizar el siguiente comando::
+
+    nm_dbus_python.connecttoAP(ssid, password=pssw, user=usr)
+
+en los ejemplos anteriores, los parametros ssid, pssw y usr, son cadenas de caracteres,
+por ejemplo::
+
+    nm_dbus_python.connecttoAP("wifi network", password="password", user="user")
+
+ademas, la funcion connectoAP cuenta con un parametro adicional para establecer 
+un tiempo maximo de espera para la respuesta de la conexion, por ejemplo, si se 
+va a esperar como maximo 5 segundos a que se conecte a una red, se debe utilizar 
+de la siguiente forma::
+
+    nm_dbus_python.connecttoAP("wifi network", password="password", timeout=5)
+
+si se conoce el bssid (direccion MAC) de la red se puede utilizar el siguiente
+comando::
+
+    nm_dbus_python.connecttoAP("",bssid="CC:35:40:98:A8:3F", password="password")
+
+tambien se puede ingresar el bssid y el ssid de la red::
+
+    nm_dbus_python.connecttoAP("wifi network",bssid="CC:35:40:98:A8:3F", password="password")
+
+en este caso se tratara de conectar a la red "wifi network", en caso de encontrar 
+la red o de no poder acceder a ella, intentara conectarse a la red con bssid = ``"CC:35:40:98:A8:3F"``
+
+
+===
+API
+===
+
+.. automodule:: nm_dbus_python
+   :members: accessPoints, connectProfile, deactive_wireless_conn, get_all_ap_info, create_connProfile, connecttoAP, connectMAC, JaverianaCali, Invitados_JaverianaCali

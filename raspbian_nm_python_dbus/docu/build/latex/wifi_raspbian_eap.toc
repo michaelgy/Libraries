@@ -1,0 +1,10 @@
+\babel@toc {english}{}
+\contentsline {chapter}{\numberline {1}Instalación}{3}{chapter.1}% 
+\contentsline {section}{\numberline {1.1}Deshabilitar dhcpcd (servicio e icono en el panel o barra de herramientas)}{3}{section.1.1}% 
+\contentsline {section}{\numberline {1.2}Instalar NetworkManager y las libreras necesarias para python}{3}{section.1.2}% 
+\contentsline {chapter}{\numberline {2}Uso}{4}{chapter.2}% 
+\contentsline {section}{\numberline {2.1}Impotar la libreria}{4}{section.2.1}% 
+\contentsline {section}{\numberline {2.2}Conexion a redes Wifi:}{4}{section.2.2}% 
+\contentsline {chapter}{\numberline {3}API}{6}{chapter.3}% 
+\contentsline {section}{Python Module Index}{8}{section*.12}% 
+\contentsline {section}{Index}{9}{section*.13}% 

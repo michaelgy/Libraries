@@ -1,0 +1,37 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{accessPoints()}\spxextra{in module nm\_dbus\_python}, \hyperpage{6}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{connectMAC()}\spxextra{in module nm\_dbus\_python}, \hyperpage{7}
+  \item \spxentry{connectProfile()}\spxextra{in module nm\_dbus\_python}, \hyperpage{6}
+  \item \spxentry{connecttoAP()}\spxextra{in module nm\_dbus\_python}, \hyperpage{6}
+  \item \spxentry{create\_connProfile()}\spxextra{in module nm\_dbus\_python}, \hyperpage{6}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{deactive\_wireless\_conn()}\spxextra{in module nm\_dbus\_python}, \hyperpage{6}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{get\_all\_ap\_info()}\spxextra{in module nm\_dbus\_python}, \hyperpage{6}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{Invitados\_JaverianaCali()}\spxextra{in module nm\_dbus\_python}, \hyperpage{7}
+
+  \indexspace
+  \bigletter J
+  \item \spxentry{JaverianaCali()}\spxextra{in module nm\_dbus\_python}, \hyperpage{7}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{nm\_dbus\_python}\spxextra{module}, \hyperpage{6}
+
+\end{sphinxtheindex}
