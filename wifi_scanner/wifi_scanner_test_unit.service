@@ -1,0 +1,9 @@
+[Unit]
+Description=test systemd service for wifi_scanner.py script.
+
+[Service]
+Type=simple
+ExecStart=sudo /home/pi/Documents/nm_dbus_python/wifi_scanner.py | systemd-cat -p info
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,5 @@
-#!/usr/bin/python3
-#Run as sudo for complete AP list
 import re
-import wifi_scanner.config as config
+import wifi_aptest.config as config
 from os import listdir,remove
 import wifi_scan_common_tools as wctools
 import json
@@ -9,10 +7,8 @@ import requests, traceback
 
 #falta ssid
 reg_list = [
-    re.compile(r"Address:\s(?P<ssidMac>.+)$"),
-    re.compile(r"^Frequency:(?P<bandaFrecuencia>[\d.]+)\s+GHz\s+\(Channel (?P<canal>\d+)\)$"),
-    re.compile(r"Signal level=(?P<dbm>.+) d.+$"),
-    re.compile(r"^ESSID:\"(?P<ssidNombre>.*)\"$")
+    re.compile(r"^\d+\s+packets transmitted,\s+\d+\s+received,\s+(?P<loss>[\d+\.]+)\% packet loss,\s+time \d+ms"),
+    re.compile(r"^rtt min/avg/max/mdev = (?P<minv>[\d\.]+)/(?P<avgv>[\d\.]+)/(?P<maxv>[\d\.]+)")
 ]
 
 macaddr = wctools.get_macaddr()
@@ -20,29 +16,34 @@ macaddr = wctools.get_macaddr()
 def parse(content,reg_list,additional_info={}):
     """parse the output of a cmd output in to a dictionary of tokens
 """
-    cells = []
+    info = {}
     i = 0
     for line in content.split('\n'):
         sres  = reg_list[i].search(line.strip())
         if sres is not None:
-            if i==0:
-                cells.append(sres.groupdict())
-                cells[-1].update(additional_info)
-            else:
-                cells[-1].update(sres.groupdict())
-            i = (i+1)%len(reg_list)
-    return cells
+            i=(i+1)%len(reg_list)
+            info.update(sres.groupdict())
+    return info
 
+url = "www.google.com"
 def scan(interface='wlan0'):
-    content = wctools.get_command_output("iwlist {} scan".format(interface))
+    cmd = "ping -c {count} -i {interval} -I {interface} -W {timeout} -w {deadline} {url}"
+    params = {
+        "count":config.count,
+        "interval":config.interval,
+        "interface":interface,
+        "timeout":config.timeout,
+        "deadline":config.deadline,
+        "url":url}
+    content = wctools.get_command_output(cmd.format(**params))
     additional_info={
         "fecha":wctools.get_datetime_str(config.datetime_format_data),
         "macDispositivo":macaddr,
-        "ubicacion":config.ubicacion
-    }
+    } #falta macssid, dbm, conexion exitosa, direccionweb
     cells = parse(content,reg_list,additional_info=additional_info)
     return cells
-
+print(scan())
+            
 def save_data(remain):
     file_name = wctools.get_datetime_str(config.datetime_format_file)+".json"
     with open(config.files_path+"/"+file_name,"w+") as f:
@@ -101,4 +102,4 @@ def pend_f(pending):
         remove(config.files_path+"/"+file_name)
 pend_args = ()
 
-wctools.main(init_f, init_args, main_f, main_args, pend_f, pend_args, config, debug = False)
+#wctools.main(init_f, init_args, main_f, main_args, pend_f, pend_args, config, debug = False)
