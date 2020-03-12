@@ -12,6 +12,7 @@ from datetime import datetime
 import re
 import time
 from os import listdir
+import nm_connection
 
 
 regex_scan = [
@@ -155,15 +156,17 @@ def update_from_db():
     }
 
 def main_f(pending_scan,pending_aptest):
-    print("scanning")
     targets = update_from_db()
+    print("scanning")
     sc_cells = scan()
     aptest_cells = []
+    print("AP testing")
     for ssid in targets:
         for channel in targets[ssid]:
             #in this step wireless connection must be performed
             for url in targets[ssid][channel]:
                 aptest_cells.append(scan(url))
+
     remain = send_data_to_server(sc_cells,config_scanner)
     if remain:
         file_name = save_data(remain,config_scanner)
@@ -219,4 +222,3 @@ def main():
                 print("no pending")
             time.sleep(config.sample_time-total_time)
             total_time += config.sample_time
-#wctools.main(init_f, init_args, main_f, main_args, pend_f, pend_args, config, debug = False)
