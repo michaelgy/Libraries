@@ -31,4 +31,3 @@ if __name__ == "__main__":
     for p in r:
         print(p.name,"\t",str(p))
     print(len(r))
-    
