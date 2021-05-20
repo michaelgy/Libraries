@@ -1,12 +1,13 @@
 """
 Funciona para las semanas 01 a 08 de los reportes del 2020
 """
-from BaseClasses import ProcessFileWF
+from .BaseClasses import ProcessFileWF
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill
 import re
 from openpyxl.styles.colors import Color
 from copy import copy
+from pathlib import Path
 
 class main(ProcessFileWF):
     def __init__(self, input_file:str, output_file:str):
@@ -22,7 +23,7 @@ class main(ProcessFileWF):
 
         rd = 0
         for c in input_sheet["B"]:
-            if c.value == "EQUIPO":
+            if c.value == "EQUIPO" or c.value == "EQUIPOS":
                 rd = c.row
                 break
         
@@ -36,18 +37,24 @@ class main(ProcessFileWF):
             v = input_sheet.cell(row=rdi, column=columna_busqueda).value.strip().lower()
             if not re.fullmatch(".*sin.*novedad.*", v): #Verificar que hayan novedades para copiar
                 rdf =rd+1
-                while(input_sheet.cell(row=rdf, column=columna_busqueda).value):
+
+                v = input_sheet.cell(row=rdf, column=columna_busqueda)
+                while(v.value and len(v.value.strip())>=4):
                     rdf+=1
+                    v = input_sheet.cell(row=rdf, column=columna_busqueda)
                 for r in range(rdi,rdf):
                     for c in range(columna_inicio_datos, columna_final_datos+1):
                         cout = output_sheet.cell(row=output_startrow+r-rdi, column=columna_inicio+c-columna_inicio_datos)
                         cin = input_sheet.cell(row=r, column=c)
                         cout.value = cin.value
+                        """
                         if r == rdi+1:
                             print("-----"*20)
                             print(cin.fill.bgColor)
                             print("-----"*20)
+                        """
                         cout.fill =  copy(cin.fill)
+                    output_sheet.cell(row=output_startrow+r-rdi, column=columna_inicio+columna_final_datos-columna_inicio_datos+1).value = Path(self.input_file).name
 
                     t = t +1
         print("\t {} {} {}".format("Se escribieron", t, "filas"))
@@ -64,7 +71,7 @@ class main(ProcessFileWF):
             self.process_sheet(wbinput[n], wsout, lastrow+1)
         
         fname, extension = self.output_file.split(".")
-        wboutput.save(fname+"_tmp."+extension)
+        wboutput.save(self.output_file)
 
 if __name__ == "__main__":
     """Testing"""
