@@ -14,7 +14,7 @@ class main(ProcessFileWF):
         super().__init__(input_file, output_file)
         self.process()
     
-    def process_sheet(self, input_sheet:"Worksheet object", output_sheet:"Worksheet object", output_startrow:int):
+    def process_sheet(self, input_sheet:"Worksheet object", output_sheet:"Worksheet object", output_startrow:int, output_startrow_micro:int):
         """input_sheet: hoja de datos donde se van a extraer los datos
         output_sheet: hoja de datos donde se van a guardar los datos
         output_startrow: fila de output_sheet donde se comienzan a escribir los datos
@@ -30,14 +30,16 @@ class main(ProcessFileWF):
         t = 0
         if rd:
             rdi =rd+1
+            rdf = rd+1
             columna_busqueda = 2
             columna_inicio_datos = 2 #Columna de input_sheet donde comienzan los datos
-            columna_final_datos = 8 #Columna de input_sheet donde terminan los datos
+            columna_final_datos = 9 #Columna de input_sheet donde terminan los datos
+            columna_inicio_micro = 3 #Columna de input_sheet donde comienzan los datos de microparadas
+            columna_final_micro = 5 #Columna de input_sheet donde terminan los datos de microparadas
             columna_inicio = 2 #Columna de output_sheet donde comienzan los datos
+            columna_inicio_m = 13 #Columna de output_sheet donde comienzan los datos de microparadas
             v = input_sheet.cell(row=rdi, column=columna_busqueda).value.strip().lower()
             if not re.fullmatch(".*sin.*novedad.*", v): #Verificar que hayan novedades para copiar
-                rdf =rd+1
-
                 v = input_sheet.cell(row=rdf, column=columna_busqueda)
                 while(v.value and len(v.value.strip())>=4):
                     rdf+=1
@@ -55,8 +57,17 @@ class main(ProcessFileWF):
                         """
                         cout.fill =  copy(cin.fill)
                     output_sheet.cell(row=output_startrow+r-rdi, column=columna_inicio+columna_final_datos-columna_inicio_datos+1).value = Path(self.input_file).name
-
                     t = t +1
+            for r in range(rdf,len(input_sheet["B"])):
+                cin = input_sheet.cell(row=r, column=2).value
+                if isinstance(cin, str) and re.fullmatch(".*micro.*",cin, re.I):
+                    rdf = r
+                    break
+            for c in range(columna_inicio_micro, columna_final_micro+1):
+                cin = input_sheet.cell(row=rdf+1, column=c)
+                cout = output_sheet.cell(row=output_startrow_micro, column=columna_inicio_m+c-columna_inicio_micro)
+                cout.value = cin.value
+
         print("\t {} {} {}".format("Se escribieron", t, "filas"))
     def process(self):
         wbinput = load_workbook(filename = self.input_file, keep_vba=True)
@@ -68,7 +79,11 @@ class main(ProcessFileWF):
 
         for n in filter(fm, wbinput.sheetnames):
             lastrow = len(wsout["B"]) # last row with data
-            self.process_sheet(wbinput[n], wsout, lastrow+1)
+            lastrowm = 1
+            while lastrowm <= lastrow and wsout.cell(row=lastrowm, column=13).value:
+                lastrowm += 1
+            lastrowm -= 1
+            self.process_sheet(wbinput[n], wsout, lastrow+1, lastrowm+1)
         
         fname, extension = self.output_file.split(".")
         wboutput.save(self.output_file)

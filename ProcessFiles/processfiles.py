@@ -30,8 +30,8 @@ def procesar2():
     r = get_files(root_dir_path, file_pattern_1)
     for p in r:
         print(p.name)
-        #PWE2.main(str(p), output_file)
-        #time.sleep(3)
+        PWE2.main(str(p), output_file)
+        time.sleep(3)
     print(len(r))
 
 if __name__ == "__main__":
